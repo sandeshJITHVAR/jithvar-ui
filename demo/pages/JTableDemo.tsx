@@ -247,6 +247,28 @@ const floatingActions: JTableFloatingConfig = {
                     alert('Deleted!');
                   }
                 },
+                visible: (row) => row.id <= 7, // Show delete for first 7 rows
+              },
+              {
+                icon: '📄',
+                tooltip: 'Duplicate record',
+                variant: 'secondary',
+                onClick: (row) => alert(`Duplicate ${row.name}`),
+                visible: (row) => row.id <= 5, // Show duplicate for first 5 rows
+              },
+              {
+                icon: '📧',
+                tooltip: 'Send email',
+                variant: 'info',
+                onClick: (row) => alert(`Email to ${row.email}`),
+                visible: (row) => row.id <= 3, // Show email for first 3 rows
+              },
+              {
+                icon: '🔒',
+                tooltip: 'Lock record',
+                variant: 'warning',
+                onClick: (row) => alert(`Lock ${row.name}`),
+                visible: (row) => row.id <= 2, // Show lock for first 2 rows
               },
             ]}
             actionColumnPosition="right"

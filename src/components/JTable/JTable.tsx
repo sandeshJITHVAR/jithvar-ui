@@ -79,7 +79,7 @@ export const JTable: React.FC<JTableProps> = ({
   const [openDropdownRowId, setOpenDropdownRowId] = useState<string | null>(null);
   const filterRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const floatingMenuRef = useRef<HTMLDivElement | null>(null);
-  const hideFloatingMenuTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const hideFloatingMenuTimeoutRef = useRef<number | null>(null);
 
   // Update URL when state changes
   const updateURL = useCallback((newState: TableState) => {
@@ -217,11 +217,18 @@ export const JTable: React.FC<JTableProps> = ({
           setFloatingMenuPosition(null);
         }
       }
+      // Close action dropdown when clicking outside
+      if (openDropdownRowId) {
+        const target = event.target as HTMLElement;
+        if (!target.closest('.jv-jtable-action-dropdown-wrapper')) {
+          setOpenDropdownRowId(null);
+        }
+      }
     };
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [state.activeFilterColumn, floatingMenuPosition]);
+  }, [state.activeFilterColumn, floatingMenuPosition, openDropdownRowId]);
 
   const handleSort = (columnKey: string) => {
     setState((prev) => ({
@@ -424,6 +431,70 @@ export const JTable: React.FC<JTableProps> = ({
         {action.icon && <span className="jv-jtable-action-icon">{action.icon}</span>}
         {action.label && <span className="jv-jtable-action-label">{action.label}</span>}
       </button>
+    );
+  };
+
+  const renderActionsWithDropdown = (row: any, rowId: string) => {
+    // Filter visible actions
+    const visibleActions = actions.filter(action => {
+      const isVisible = action.visible ? action.visible(row) : true;
+      return isVisible;
+    });
+
+    // If 3 or fewer actions, show all normally
+    if (visibleActions.length <= 3) {
+      return visibleActions.map((action, index) => renderActionButton(action, row, index));
+    }
+
+    // Show first 2 actions + dropdown for the rest
+    const primaryActions = visibleActions.slice(0, 2);
+    const dropdownActions = visibleActions.slice(2);
+    const isDropdownOpen = openDropdownRowId === rowId;
+
+    return (
+      <>
+        {primaryActions.map((action, index) => renderActionButton(action, row, index))}
+        <div className="jv-jtable-action-dropdown-wrapper">
+          <button
+            className="jv-jtable-action-btn jv-jtable-action-btn-secondary"
+            onClick={(e) => {
+              e.stopPropagation();
+              setOpenDropdownRowId(isDropdownOpen ? null : rowId);
+            }}
+            title="More actions"
+            type="button"
+          >
+            <span className="jv-jtable-action-icon">⋮</span>
+          </button>
+          {isDropdownOpen && (
+            <div className="jv-jtable-action-dropdown">
+              {dropdownActions.map((action, index) => {
+                const isDisabled = action.disabled ? action.disabled(row) : false;
+                return (
+                  <button
+                    key={index + 2}
+                    className={classNames(
+                      'jv-jtable-action-dropdown-item',
+                      action.variant && `jv-jtable-action-dropdown-item-${action.variant}`
+                    )}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      action.onClick(row, index + 2);
+                      setOpenDropdownRowId(null);
+                    }}
+                    disabled={isDisabled}
+                    title={action.tooltip}
+                    type="button"
+                  >
+                    {action.icon && <span className="jv-jtable-action-icon">{action.icon}</span>}
+                    <span className="jv-jtable-action-dropdown-label">{action.tooltip || 'Action'}</span>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </>
     );
   };
 
@@ -882,7 +953,7 @@ export const JTable: React.FC<JTableProps> = ({
                     {hasActions && actionColumnPosition === 'left' && (
                       <td className="jv-jtable-action-column">
                         <div className="jv-jtable-actions">
-                          {actions.map((action, actionIndex) => renderActionButton(action, row, actionIndex))}
+                          {renderActionsWithDropdown(row, currentRowId)}
                         </div>
                       </td>
                     )}
@@ -904,7 +975,7 @@ export const JTable: React.FC<JTableProps> = ({
                     {hasActions && actionColumnPosition === 'right' && (
                       <td className="jv-jtable-action-column">
                         <div className="jv-jtable-actions">
-                          {actions.map((action, actionIndex) => renderActionButton(action, row, actionIndex))}
+                          {renderActionsWithDropdown(row, currentRowId)}
                         </div>
                       </td>
                     )}
