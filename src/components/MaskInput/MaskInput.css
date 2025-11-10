@@ -1,0 +1,81 @@
+/* MaskInput Component Styles */
+.jv-mask-input-wrapper {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+
+.jv-mask-input-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.jv-mask-input {
+  width: 100%;
+  border: 2px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: 'Courier New', monospace;
+  color: #374151;
+  background: white;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.jv-mask-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.jv-mask-input:hover:not(:disabled) {
+  border-color: #9ca3af;
+}
+
+.jv-mask-input::placeholder {
+  color: #9ca3af;
+  font-family: 'Courier New', monospace;
+}
+
+.jv-mask-input.disabled {
+  background: #f3f4f6;
+  color: #9ca3af;
+  cursor: not-allowed;
+  border-color: #e5e7eb;
+}
+
+.jv-mask-input.error {
+  border-color: #ef4444;
+}
+
+.jv-mask-input.error:focus {
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+/* Sizes */
+.jv-mask-input.small {
+  padding: 8px 12px;
+  font-size: 12px;
+}
+
+.jv-mask-input.medium {
+  padding: 10px 14px;
+  font-size: 14px;
+}
+
+.jv-mask-input.large {
+  padding: 12px 16px;
+  font-size: 16px;
+}
+
+/* Helper Text */
+.jv-mask-input-helper {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.jv-mask-input-error {
+  font-size: 12px;
+  color: #ef4444;
+}

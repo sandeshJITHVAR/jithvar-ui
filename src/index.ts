@@ -10,6 +10,13 @@ export { CheckboxList } from './components/CheckboxList';
 export { Radio } from './components/Radio';
 export { RadioGroup } from './components/RadioGroup';
 export { ToggleButtons } from './components/ToggleButtons';
+export { Tabs } from './components/Tabs';
+export { Collapse } from './components/Collapse';
+export { MaskInput } from './components/MaskInput';
+export { BarChart } from './components/BarChart';
+export { PieChart } from './components/PieChart';
+export { DonutChart } from './components/DonutChart';
+export { LineChart } from './components/LineChart';
 
 // Types
 export type { DateRange } from './types';
@@ -19,6 +26,13 @@ export type { CheckboxListProps, CheckboxOption } from './components/CheckboxLis
 export type { RadioProps } from './components/Radio';
 export type { RadioGroupProps, RadioOption } from './components/RadioGroup';
 export type { ToggleButtonsProps, ToggleOption } from './components/ToggleButtons';
+export type { TabsProps, Tab } from './components/Tabs';
+export type { CollapseProps, CollapsePanel } from './components/Collapse';
+export type { MaskInputProps } from './components/MaskInput';
+export type { BarChartProps, BarChartDataPoint } from './components/BarChart';
+export type { PieChartProps, PieChartDataPoint } from './components/PieChart';
+export type { DonutChartProps } from './components/DonutChart';
+export type { LineChartProps, LineChartDataPoint, LineChartDataset } from './components/LineChart';
 export type { 
   JTableColumn, 
   JTableAction, 

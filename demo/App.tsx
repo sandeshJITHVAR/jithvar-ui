@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter, Routes, Route, Link, useLocation } from 'react-router-dom';
 import './demo.css';
 import { ScrollToTop } from './components/ScrollToTop';
@@ -17,6 +17,13 @@ import { CheckboxDemo } from './pages/CheckboxDemo';
 import { CheckboxListDemo } from './pages/CheckboxListDemo';
 import { RadioGroupDemo } from './pages/RadioGroupDemo';
 import { ToggleButtonsDemo } from './pages/ToggleButtonsDemo';
+import { TabsDemo } from './pages/TabsDemo';
+import { CollapseDemo } from './pages/CollapseDemo';
+import { MaskInputDemo } from './pages/MaskInputDemo';
+import { BarChartDemo } from './pages/BarChartDemo';
+import { PieChartDemo } from './pages/PieChartDemo';
+import { DonutChartDemo } from './pages/DonutChartDemo';
+import { LineChartDemo } from './pages/LineChartDemo';
 
 const navItems = [
   { path: '/', label: '🏠 Dashboard', component: Dashboard },
@@ -29,6 +36,7 @@ const navItems = [
       { path: '/radio-group', label: '📻 Radio Group', component: RadioGroupDemo },
       { path: '/toggle-buttons', label: '🎚️ Toggle Buttons', component: ToggleButtonsDemo },
       { path: '/searchable-select', label: '🔍 Searchable Select', component: SearchableSelectDemo },
+      { path: '/mask-input', label: '🎭 Mask Input', component: MaskInputDemo },
     ]
   },
   {
@@ -40,10 +48,26 @@ const navItems = [
     ]
   },
   {
+    category: 'Content & Layout',
+    items: [
+      { path: '/tabs', label: '📑 Tabs', component: TabsDemo },
+      { path: '/collapse', label: '📂 Collapse', component: CollapseDemo },
+    ]
+  },
+  {
     category: 'Data & Feedback',
     items: [
       { path: '/jtable', label: '📊 JTable', component: JTableDemo },
       { path: '/jalerts', label: '🚨 JAlerts', component: JAlertsDemo },
+    ]
+  },
+  {
+    category: 'Charts',
+    items: [
+      { path: '/charts/bar-charts', label: '📊 Bar Charts', component: BarChartDemo },
+      { path: '/charts/pie-charts', label: '🥧 Pie Charts', component: PieChartDemo },
+      { path: '/charts/donut-charts', label: '🍩 Donut Charts', component: DonutChartDemo },
+      { path: '/charts/line-charts', label: '📈 Line Charts', component: LineChartDemo },
     ]
   },
   { path: '/configuration', label: '⚙️ Configuration', component: ConfigurationGuide },
@@ -51,21 +75,42 @@ const navItems = [
 
 const Sidebar: React.FC = () => {
   const location = useLocation();
-  
+  const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({});
+
+  const toggleCategory = (category: string) => {
+    setExpandedCategories(prev => ({
+      ...prev,
+      [category]: !prev[category]
+    }));
+  };
+
   const renderNavItem = (item: any, index: number) => {
     if (item.category) {
+      const isExpanded = expandedCategories[item.category];
       return (
         <div key={index} className="jv-sidebar-category">
-          <div className="jv-sidebar-category-label">{item.category}</div>
-          {item.items.map((subItem: any) => (
-            <Link
-              key={subItem.path}
-              to={subItem.path}
-              className={`jv-sidebar-link ${location.pathname === subItem.path ? 'active' : ''}`}
-            >
-              {subItem.label}
-            </Link>
-          ))}
+          <button 
+            className="jv-sidebar-category-label"
+            onClick={() => toggleCategory(item.category)}
+          >
+            <span className="jv-sidebar-category-icon">
+              {isExpanded ? '▼' : '▶'}
+            </span>
+            <span>{item.category}</span>
+          </button>
+          {isExpanded && (
+            <div className="jv-sidebar-submenu">
+              {item.items.map((subItem: any) => (
+                <Link
+                  key={subItem.path}
+                  to={subItem.path}
+                  className={`jv-sidebar-link jv-sidebar-sublink ${location.pathname === subItem.path ? 'active' : ''}`}
+                >
+                  {subItem.label}
+                </Link>
+              ))}
+            </div>
+          )}
         </div>
       );
     }
@@ -90,11 +135,38 @@ const Sidebar: React.FC = () => {
         {navItems.map((item, index) => renderNavItem(item, index))}
       </nav>
       <div className="jv-sidebar-footer">
+        <a href="https://jithvar.com" target="_blank" rel="noopener noreferrer" title="Jithvar - Parent Company">
+          🏢 Jithvar
+        </a>
         <a href="https://github.com/yourusername/jithvar-ui" target="_blank" rel="noopener noreferrer">
           GitHub
         </a>
         <a href="https://www.npmjs.com/package/jithvar-ui" target="_blank" rel="noopener noreferrer">
           npm
+        </a>
+      </div>
+    </div>
+  );
+};
+
+const TopBar: React.FC = () => {
+  return (
+    <div className="jv-topbar">
+      <div className="jv-topbar-title">
+        <h2>Jithvar UI Component Library</h2>
+      </div>
+      <div className="jv-topbar-actions">
+        <a href="https://jithvar.com" target="_blank" rel="noopener noreferrer" className="jv-topbar-link">
+          🏢 Jithvar
+        </a>
+        <a href="https://github.com/yourusername/jithvar-ui" target="_blank" rel="noopener noreferrer" className="jv-topbar-link">
+          ⭐ GitHub
+        </a>
+        <a href="https://www.npmjs.com/package/jithvar-ui" target="_blank" rel="noopener noreferrer" className="jv-topbar-link">
+          📦 npm
+        </a>
+        <a href="#" className="jv-topbar-link">
+          📖 Docs
         </a>
       </div>
     </div>
@@ -117,13 +189,16 @@ export const App: React.FC = () => {
       <ScrollToTop />
       <div className="jv-demo-container">
         <Sidebar />
-        <main className="jv-demo-main">
-          <Routes>
-            {allRoutes.map((item) => (
-              <Route key={item.path} path={item.path} element={<item.component />} />
-            ))}
-          </Routes>
-        </main>
+        <div className="jv-demo-content-wrapper">
+          <TopBar />
+          <main className="jv-demo-main">
+            <Routes>
+              {allRoutes.map((item) => (
+                <Route key={item.path} path={item.path} element={<item.component />} />
+              ))}
+            </Routes>
+          </main>
+        </div>
       </div>
     </BrowserRouter>
   );

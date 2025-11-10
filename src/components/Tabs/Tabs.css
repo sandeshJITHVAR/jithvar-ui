@@ -1,0 +1,266 @@
+/* Tabs Component Styles */
+.jv-tabs {
+  display: flex;
+  width: 100%;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+  background: white;
+}
+
+.jv-tabs-top {
+  flex-direction: column;
+}
+
+.jv-tabs-left,
+.jv-tabs-right {
+  flex-direction: row;
+}
+
+.jv-tabs-left .jv-tabs-nav {
+  flex-direction: column;
+  border-right: 1px solid #e5e7eb;
+  border-bottom: none;
+}
+
+.jv-tabs-right .jv-tabs-nav {
+  flex-direction: column;
+  border-left: 1px solid #e5e7eb;
+  border-bottom: none;
+  order: 2;
+}
+
+/* Tabs Navigation */
+.jv-tabs-nav {
+  display: flex;
+  position: relative;
+}
+
+.jv-tabs-nav.jv-tabs-default {
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.jv-tabs-nav.jv-tabs-underline {
+  border-bottom: 2px solid #e5e7eb;
+  gap: 0;
+}
+
+.jv-tabs-nav.jv-tabs-pills {
+  gap: 8px;
+  background: #f3f4f6;
+  padding: 4px;
+  border-radius: 12px;
+}
+
+.jv-tabs-nav.jv-tabs-boxed {
+  gap: 4px;
+  background: #f9fafb;
+  padding: 4px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+}
+
+/* Tab Button */
+.jv-tab-button {
+  padding: 12px 24px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  color: #6b7280;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.jv-tab-button:hover:not(.disabled) {
+  color: #374151;
+}
+
+.jv-tab-button.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.jv-tab-icon {
+  font-size: 1.2em;
+}
+
+/* Sizes */
+.jv-tabs-small .jv-tab-button {
+  padding: 8px 16px;
+  font-size: 12px;
+}
+
+.jv-tabs-large .jv-tab-button {
+  padding: 14px 28px;
+  font-size: 16px;
+}
+
+/* Default Variant */
+.jv-tabs-default .jv-tab-button.active {
+  color: #374151;
+  border-bottom: 2px solid currentColor;
+  margin-bottom: -2px;
+}
+
+/* Underline Variant */
+.jv-tabs-underline .jv-tab-button {
+  flex: 1;
+  justify-content: center;
+}
+
+.jv-tabs-underline .jv-tab-button.active {
+  color: #374151;
+}
+
+.jv-tabs-indicator {
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  height: 2px;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Pills Variant */
+.jv-tabs-pills .jv-tab-button {
+  border-radius: 8px;
+}
+
+.jv-tabs-pills .jv-tab-button.active {
+  background: white;
+  color: #374151;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Boxed Variant */
+.jv-tabs-boxed .jv-tab-button {
+  border-radius: 6px;
+}
+
+.jv-tabs-boxed .jv-tab-button.active {
+  background: white;
+  color: #374151;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+/* Colors - Primary */
+.jv-tabs-primary .jv-tab-button.active {
+  color: #3b82f6;
+}
+
+.jv-tabs-primary .jv-tabs-indicator {
+  background: linear-gradient(90deg, #3b82f6 0%, #2563eb 100%);
+}
+
+.jv-tabs-primary.jv-tabs-pills .jv-tab-button.active,
+.jv-tabs-primary.jv-tabs-boxed .jv-tab-button.active {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+}
+
+/* Colors - Success */
+.jv-tabs-success .jv-tab-button.active {
+  color: #10b981;
+}
+
+.jv-tabs-success .jv-tabs-indicator {
+  background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+}
+
+.jv-tabs-success.jv-tabs-pills .jv-tab-button.active,
+.jv-tabs-success.jv-tabs-boxed .jv-tab-button.active {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+}
+
+/* Colors - Warning */
+.jv-tabs-warning .jv-tab-button.active {
+  color: #f59e0b;
+}
+
+.jv-tabs-warning .jv-tabs-indicator {
+  background: linear-gradient(90deg, #f59e0b 0%, #d97706 100%);
+}
+
+.jv-tabs-warning.jv-tabs-pills .jv-tab-button.active,
+.jv-tabs-warning.jv-tabs-boxed .jv-tab-button.active {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: white;
+}
+
+/* Colors - Danger */
+.jv-tabs-danger .jv-tab-button.active {
+  color: #ef4444;
+}
+
+.jv-tabs-danger .jv-tabs-indicator {
+  background: linear-gradient(90deg, #ef4444 0%, #dc2626 100%);
+}
+
+.jv-tabs-danger.jv-tabs-pills .jv-tab-button.active,
+.jv-tabs-danger.jv-tabs-boxed .jv-tab-button.active {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: white;
+}
+
+/* Colors - Info */
+.jv-tabs-info .jv-tab-button.active {
+  color: #06b6d4;
+}
+
+.jv-tabs-info .jv-tabs-indicator {
+  background: linear-gradient(90deg, #06b6d4 0%, #0891b2 100%);
+}
+
+.jv-tabs-info.jv-tabs-pills .jv-tab-button.active,
+.jv-tabs-info.jv-tabs-boxed .jv-tab-button.active {
+  background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+  color: white;
+}
+
+/* Colors - Purple */
+.jv-tabs-purple .jv-tab-button.active {
+  color: #8b5cf6;
+}
+
+.jv-tabs-purple .jv-tabs-indicator {
+  background: linear-gradient(90deg, #8b5cf6 0%, #7c3aed 100%);
+}
+
+.jv-tabs-purple.jv-tabs-pills .jv-tab-button.active,
+.jv-tabs-purple.jv-tabs-boxed .jv-tab-button.active {
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  color: white;
+}
+
+/* Tabs Content */
+.jv-tabs-content {
+  padding: 24px 0;
+  flex: 1;
+}
+
+.jv-tabs-content.animated {
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Focus State */
+.jv-tab-button:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}

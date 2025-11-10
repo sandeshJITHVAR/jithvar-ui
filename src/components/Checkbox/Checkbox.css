@@ -72,29 +72,40 @@
 .jv-checkbox-container.switch .jv-checkbox-box {
   width: 44px;
   height: 24px;
+  min-width: 44px;
   border-radius: 12px;
-  border: none;
-  background: #d1d5db;
-  padding: 2px;
+  border: 2px solid #d1d5db;
+  background: #e5e7eb;
+  padding: 3px;
+  display: flex;
+  align-items: center;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .jv-checkbox-container.switch.small .jv-checkbox-box {
   width: 36px;
   height: 20px;
+  min-width: 36px;
+  border-radius: 10px;
+  padding: 2px;
 }
 
 .jv-checkbox-container.switch.large .jv-checkbox-box {
   width: 52px;
   height: 28px;
+  min-width: 52px;
+  border-radius: 14px;
+  padding: 3px;
 }
 
 .jv-checkbox-switch-knob {
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   background: white;
   border-radius: 50%;
-  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  flex-shrink: 0;
 }
 
 .jv-checkbox-container.switch.small .jv-checkbox-switch-knob {
@@ -103,8 +114,8 @@
 }
 
 .jv-checkbox-container.switch.large .jv-checkbox-switch-knob {
-  width: 22px;
-  height: 22px;
+  width: 20px;
+  height: 20px;
 }
 
 .jv-checkbox-input:checked ~ .jv-checkbox-box .jv-checkbox-switch-knob {

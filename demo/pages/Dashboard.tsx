@@ -8,7 +8,7 @@ interface ComponentCard {
   icon: string;
   path: string;
   color: string;
-  category: 'input' | 'data' | 'feedback' | 'picker';
+  category: 'input' | 'data' | 'feedback' | 'picker' | 'layout';
 }
 
 export const Dashboard: React.FC = () => {
@@ -62,6 +62,14 @@ export const Dashboard: React.FC = () => {
       color: 'primary',
       category: 'input',
     },
+    {
+      title: 'Mask Input',
+      description: 'Input masking for formatted data entry',
+      icon: '🎭',
+      path: '/mask-input',
+      color: 'info',
+      category: 'input',
+    },
     // Picker Components
     {
       title: 'Date Picker',
@@ -87,6 +95,23 @@ export const Dashboard: React.FC = () => {
       color: 'purple',
       category: 'picker',
     },
+    // Layout Components
+    {
+      title: 'Tabs',
+      description: 'Tabbed interface with multiple variants',
+      icon: '📑',
+      path: '/tabs',
+      color: 'primary',
+      category: 'layout',
+    },
+    {
+      title: 'Collapse',
+      description: 'Collapsible panels and accordions',
+      icon: '📂',
+      path: '/collapse',
+      color: 'success',
+      category: 'layout',
+    },
     // Data Components
     {
       title: 'JTable',
@@ -110,6 +135,7 @@ export const Dashboard: React.FC = () => {
   const categories = [
     { key: 'input', label: 'Input Components', icon: '📝', color: '#3b82f6' },
     { key: 'picker', label: 'Pickers & Sliders', icon: '🎯', color: '#10b981' },
+    { key: 'layout', label: 'Content & Layout', icon: '📐', color: '#f59e0b' },
     { key: 'data', label: 'Data Display', icon: '📊', color: '#8b5cf6' },
     { key: 'feedback', label: 'Feedback', icon: '💬', color: '#ef4444' },
   ];

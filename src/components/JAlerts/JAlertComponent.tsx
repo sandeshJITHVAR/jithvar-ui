@@ -81,14 +81,16 @@ const JAlertComponent: React.FC<JAlertComponentProps> = (props) => {
   };
 
   const handleBackdropClick = () => {
-    if (props.allowOutsideClick !== false) {
+    // Only close on outside click if explicitly allowed
+    if (props.allowOutsideClick === true) {
       handleClose({ isConfirmed: false, isDismissed: true, isDenied: false });
     }
   };
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && props.allowEscapeKey !== false) {
+      // Only close on Escape if explicitly allowed
+      if (e.key === 'Escape' && props.allowEscapeKey === true) {
         handleClose({ isConfirmed: false, isDismissed: true, isDenied: false });
       }
     };
@@ -729,7 +731,7 @@ const JAlertComponent: React.FC<JAlertComponentProps> = (props) => {
           style={{
             position: 'absolute',
             inset: 0,
-            background: 'rgba(0, 0, 0, 0.5)',
+            background: 'rgba(0, 0, 0, 0.6)',
             backdropFilter: props.backdropBlur ? 'blur(8px)' : 'none',
             opacity: isVisible ? 1 : 0,
             transition: 'opacity 0.3s ease',

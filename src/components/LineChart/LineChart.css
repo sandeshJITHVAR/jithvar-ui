@@ -1,0 +1,87 @@
+/* Line Chart Styles */
+.jv-line-chart {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.jv-line-chart-title {
+  margin: 0 0 20px 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: #1f2937;
+  text-align: center;
+}
+
+.jv-line-chart-svg {
+  display: block;
+  margin: 0 auto;
+}
+
+.jv-line-chart-line {
+  transition: stroke-dashoffset 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.jv-line-chart-area {
+  transition: stroke-dashoffset 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.jv-line-chart-point {
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.jv-line-chart-point:hover {
+  r: 7;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+.jv-line-chart-grid-line {
+  stroke: #e5e7eb;
+  stroke-width: 1;
+  stroke-dasharray: 4 4;
+}
+
+.jv-line-chart-axis {
+  stroke: #9ca3af;
+  stroke-width: 2;
+}
+
+.jv-line-chart-label {
+  fill: #6b7280;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.jv-line-chart-axis-label {
+  fill: #9ca3af;
+  font-size: 11px;
+}
+
+/* Legend */
+.jv-line-chart-legend {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+
+.jv-line-chart-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.jv-line-chart-legend-color {
+  width: 24px;
+  height: 3px;
+  border-radius: 2px;
+}
+
+.jv-line-chart-legend-label {
+  font-size: 13px;
+  color: #6b7280;
+  font-weight: 500;
+}

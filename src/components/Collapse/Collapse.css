@@ -1,0 +1,188 @@
+/* Collapse Component Styles */
+.jv-collapse {
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  overflow: hidden;
+}
+
+.jv-collapse.bordered {
+  border: 1px solid #e5e7eb;
+}
+
+.jv-collapse.ghost {
+  background: transparent;
+  border: none;
+}
+
+.jv-collapse.ghost .jv-collapse-panel {
+  border: none;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.jv-collapse.ghost .jv-collapse-panel:last-child {
+  border-bottom: none;
+}
+
+/* Collapse Panel */
+.jv-collapse-panel {
+  background: white;
+  border-bottom: 1px solid #e5e7eb;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.jv-collapse-panel:last-child {
+  border-bottom: none;
+}
+
+.jv-collapse-panel:first-child .jv-collapse-header {
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+
+.jv-collapse-panel:last-child .jv-collapse-header {
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+.jv-collapse-panel.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.jv-collapse-panel.disabled .jv-collapse-header {
+  cursor: not-allowed;
+}
+
+/* Collapse Header */
+.jv-collapse-header {
+  display: flex;
+  align-items: center;
+  padding: 16px 20px;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.2s;
+  gap: 12px;
+}
+
+.jv-collapse-header:hover:not(.disabled) {
+  background: #f9fafb;
+}
+
+.jv-collapse-header.left {
+  flex-direction: row;
+}
+
+.jv-collapse-header.right {
+  flex-direction: row-reverse;
+}
+
+.jv-collapse-header.right .jv-collapse-arrow {
+  margin-left: 0;
+  margin-right: auto;
+}
+
+.jv-collapse-header-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.jv-collapse-header-text {
+  font-size: 15px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.jv-collapse-icon-custom {
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.jv-collapse-extra {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+  margin-right: 12px;
+}
+
+/* Collapse Arrow */
+.jv-collapse-arrow {
+  font-size: 12px;
+  color: #6b7280;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: rotate(0deg);
+}
+
+.jv-collapse-arrow.active {
+  transform: rotate(90deg);
+}
+
+/* Collapse Content */
+.jv-collapse-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+    padding 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 0;
+  padding: 0 20px;
+}
+
+.jv-collapse-content.active {
+  max-height: 2000px;
+  opacity: 1;
+  padding: 0 20px;
+}
+
+.jv-collapse-content-inner {
+  padding: 16px 0;
+  color: #6b7280;
+  line-height: 1.6;
+  animation: fadeInContent 0.4s ease-out;
+}
+
+@keyframes fadeInContent {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Sizes */
+.jv-collapse.small .jv-collapse-header {
+  padding: 10px 16px;
+  font-size: 13px;
+}
+
+.jv-collapse.small .jv-collapse-content-inner {
+  padding: 10px 16px;
+  font-size: 13px;
+}
+
+.jv-collapse.large .jv-collapse-header {
+  padding: 20px 24px;
+  font-size: 17px;
+}
+
+.jv-collapse.large .jv-collapse-content-inner {
+  padding: 20px 24px;
+  font-size: 15px;
+}
+
+/* Focus State */
+.jv-collapse-header:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: -2px;
+}
+
+/* Active Panel gets subtle background change */
+.jv-collapse-panel.active .jv-collapse-header {
+  background: #f9fafb;
+}

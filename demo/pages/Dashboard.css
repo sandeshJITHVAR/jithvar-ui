@@ -1,14 +1,17 @@
 /* Dashboard Styles */
 .dashboard-page {
-  min-height: 100vh;
+  min-height: calc(100vh - 64px);
   background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  width: 100%;
+  margin: 0;
+  padding: 0;
 }
 
 /* Hero Section */
 .dashboard-hero {
   position: relative;
-  padding: 80px 40px;
-  margin-bottom: 60px;
+  padding: 60px 40px;
+  margin: 0 0 60px 0;
   overflow: hidden;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   border-radius: 0 0 32px 32px;
