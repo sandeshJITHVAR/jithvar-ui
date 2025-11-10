@@ -1,0 +1,1 @@
+export { JTable } from './JTable';

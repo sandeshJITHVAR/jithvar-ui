@@ -1,0 +1,11 @@
+src/
+demo/
+node_modules/
+.github/
+.vscode/
+*.log
+.DS_Store
+tsconfig.json
+rollup.config.js
+vite.config.ts
+demo-dist/
