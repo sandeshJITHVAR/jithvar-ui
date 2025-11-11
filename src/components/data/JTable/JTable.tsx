@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { DateRangePicker } from '../DateRangePicker';
-import { RangeSlider } from '../RangeSlider';
-import { JTableColumn, JTableAction, JTableFloatingAction, JTableProps, FilterState, DateRange } from '../../types';
-import { classNames, debounce } from '../../utils/helpers';
+import { DateRangePicker } from '../../inputs/DateRangePicker';
+import { RangeSlider } from '../../inputs/RangeSlider';
+import { JTableColumn, JTableAction, JTableFloatingAction, JTableProps, FilterState, DateRange } from '../../../types';
+import { classNames, debounce } from '../../../utils/helpers';
 import './JTable.css';
 
 interface TableState {

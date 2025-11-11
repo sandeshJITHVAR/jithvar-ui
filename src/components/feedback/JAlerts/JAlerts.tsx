@@ -1,7 +1,7 @@
 import React from 'react';
 import { createRoot, Root } from 'react-dom/client';
 import JAlertComponent from './JAlertComponent';
-import { JAlertOptions, JAlertResult } from '../../types/alerts';
+import { JAlertOptions, JAlertResult } from '../../../types/alerts';
 
 class JAlerts {
   private static container: HTMLDivElement | null = null;

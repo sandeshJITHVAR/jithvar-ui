@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { createRoot, Root } from 'react-dom/client';
-import { JAlertOptions, JAlertResult } from '../../types/alerts';
+import { JAlertOptions, JAlertResult } from '../../../types/alerts';
 
 interface JAlertComponentProps extends Omit<JAlertOptions, 'onClose'> {
   onClose: (result: JAlertResult) => void;
