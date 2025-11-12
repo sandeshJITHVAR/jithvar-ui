@@ -60,8 +60,9 @@ export const JTable: React.FC<JTableProps> = ({
 }) => {
   // Determine if we should use URL state
   const shouldUseUrlState = enableUrlState;
+     const defaultVisibleColumns = columns.filter(c => c.visible !== false).map(c => c.key);
   const [state, setState] = useState<TableState>(() => {
-    const defaultVisibleColumns = columns.filter(c => c.visible !== false).map(c => c.key);
+    // const defaultVisibleColumns = columns.filter(c => c.visible !== false).map(c => c.key);
     
     if (!shouldUseUrlState) {
       // Don't read from URL in client mode or when URL state is disabled
@@ -410,6 +411,39 @@ export const JTable: React.FC<JTableProps> = ({
         ? prev.visibleColumns.filter(k => k !== columnKey)
         : [...prev.visibleColumns, columnKey],
     }));
+  };
+
+  const clearAllFilters = () => {
+    //  const defaultVisibleColumns = columns.filter(c => c.visible !== false).map(c => c.key);
+    setFilterInputs({}); // Clear all filter inputs
+    setState((prev) => ({
+      ...prev,
+      page: 1,
+      pageSize: defaultPageSize,
+      sortColumn: null,
+      sortDirection: 'asc',
+      universalSearch: '',
+      columnFilters: {},
+      activeFilterColumn: null,
+
+        selectedRows: [],
+        visibleColumns: defaultVisibleColumns,
+    
+    }));
+  };
+
+  // Check if any filters are active
+  const hasActiveFilters = () => {
+    // const defaultVisibleColumns = columns.filter(c => c.visible !== false).map(c => c.key);
+    return (
+      state.universalSearch.length > 0 ||
+      Object.keys(state.columnFilters).length > 0 ||
+      state.sortColumn !== null ||
+      state.pageSize !== defaultPageSize ||
+      state.page !== 1 ||
+    state.selectedRows.length > 0 ||
+    state.visibleColumns.length !== defaultVisibleColumns.length
+    );
   };
 
   const totalPages = Math.ceil(totalRecords / state.pageSize);
@@ -926,7 +960,8 @@ export const JTable: React.FC<JTableProps> = ({
           </div>
         )}
 
-        {/* Column Toggle */}
+<div className='jv-jtable-column-toggle-and-clear'>
+ {/* Column Toggle */}
         {enableColumnToggle && (
           <div className="jv-jtable-column-toggle">
             <button className="jv-jtable-column-toggle-btn" type="button">
@@ -946,6 +981,20 @@ export const JTable: React.FC<JTableProps> = ({
             </button>
           </div>
         )}
+
+        {/* Clear All Filters Button */}
+        {hasActiveFilters() && (
+          <button
+            className="jv-jtable-clear-all-btn"
+            onClick={clearAllFilters}
+            title="Clear all filters, search, and sorting"
+            type="button"
+          >
+             Clear All
+          </button>
+        )}
+</div>
+       
       </div>
 
       {/* Bulk Actions Bar */}

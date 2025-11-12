@@ -33,6 +33,13 @@
   gap: 0.5rem;
 }
 
+.jv-jtable-column-toggle-and-clear
+{
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .jv-jtable-bulk-actions-count {
   font-size: 0.875rem;
   font-weight: 600;
@@ -245,6 +252,38 @@
 
 .jv-jtable-column-toggle-item input {
   cursor: pointer;
+}
+
+/* Clear All Filters Button */
+.jv-jtable-clear-all-btn {
+  padding: 0.75rem 1rem;
+  border: 1px solid #ef4444;
+  border-radius: 0.5rem;
+  background: white;
+  color: #ef4444;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.jv-jtable-clear-all-btn:hover {
+  background: #fef2f2;
+  border-color: #dc2626;
+  color: #dc2626;
+  box-shadow: 0 4px 6px rgba(239, 68, 68, 0.1);
+}
+
+.jv-jtable-clear-all-btn:active {
+  transform: scale(0.98);
+}
+
+.jv-jtable-clear-all-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 /* Table Container */
