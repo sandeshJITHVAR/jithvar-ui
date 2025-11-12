@@ -21,13 +21,9 @@ export const JTable: React.FC<JTableProps> = ({
   columns,
   apiUrl,
   apiHeaders = {},
-  data: clientData,
-  totalRecords: clientTotal,
-  loading: externalLoading,
-  onFetchData,
   dataPath = 'data',
   totalPath = 'total',
-  enableUrlState,
+  enableUrlState = true,
   enableUniversalSearch = true,
   universalSearchPlaceholder = 'Search across all columns...',
   enableColumnSearch = true,
@@ -62,9 +58,8 @@ export const JTable: React.FC<JTableProps> = ({
   bordered = false,
   compact = false,
 }) => {
-  // Determine if we should use URL state (default: true for API mode, false for client mode)
-  const shouldUseUrlState = enableUrlState !== undefined ? enableUrlState : (apiUrl !== undefined || onFetchData !== undefined);
-  const isClientMode = clientData !== undefined;
+  // Determine if we should use URL state
+  const shouldUseUrlState = enableUrlState;
   const [state, setState] = useState<TableState>(() => {
     const defaultVisibleColumns = columns.filter(c => c.visible !== false).map(c => c.key);
     
@@ -100,8 +95,8 @@ export const JTable: React.FC<JTableProps> = ({
     };
   });
 
-  const [data, setData] = useState<any[]>(clientData || []);
-  const [totalRecords, setTotalRecords] = useState(clientTotal || 0);
+  const [data, setData] = useState<any[]>([]);
+  const [totalRecords, setTotalRecords] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [columnStats, setColumnStats] = useState<Record<string, { min: number; max: number }>>({});
@@ -161,97 +156,78 @@ export const JTable: React.FC<JTableProps> = ({
     window.history.pushState({}, '', newUrl);
   }, [columns, shouldUseUrlState, defaultPageSize]);
 
-  // Fetch data from API or custom fetcher
+  // Fetch data from API
   const fetchData = useCallback(async () => {
-    // Don't fetch if using client-side data
-    if (isClientMode) {
-      setData(clientData || []);
-      setTotalRecords(clientTotal || 0);
+    // Skip if no API URL provided
+    if (!apiUrl) {
       return;
     }
     
-    // Use external loading state if provided
-    if (externalLoading !== undefined) {
-      setLoading(externalLoading);
-    } else {
-      setLoading(true);
-    }
+    setLoading(true);
     setError(null);
 
     try {
-      let result: { data: any[]; total: number };
+      const params = new URLSearchParams();
+      params.set('page', String(state.page));
+      params.set('pageSize', String(state.pageSize));
+      params.set('searchMode', searchMode);
       
-      // Use custom onFetchData if provided
-      if (onFetchData) {
-        const params = {
-          page: state.page,
-          pageSize: state.pageSize,
-          sortColumn: state.sortColumn,
-          sortDirection: state.sortDirection,
-          universalSearch: state.universalSearch,
-          columnFilters: state.columnFilters,
-          searchMode,
-        };
-        result = await onFetchData(params);
-        setData(result.data || []);
-        setTotalRecords(result.total || 0);
-      } 
-      // Use apiUrl if provided
-      else if (apiUrl) {
-        const params = new URLSearchParams();
-        params.set('page', String(state.page));
-        params.set('pageSize', String(state.pageSize));
-        params.set('searchMode', searchMode);
-        
-        if (state.sortColumn) {
-          params.set('sortColumn', state.sortColumn);
-          params.set('sortDirection', state.sortDirection);
-        }
-        
-        if (state.universalSearch) {
-          params.set('search', state.universalSearch);
-        }
-        
-        // Add column filters
-        Object.entries(state.columnFilters).forEach(([key, filterState]) => {
-          if (filterState.text) {
-            params.set(key, filterState.text);
-          }
-          if (filterState.dateRange?.startDate && filterState.dateRange?.endDate) {
-            params.set(`${key}_start`, filterState.dateRange.startDate.toISOString());
-            params.set(`${key}_end`, filterState.dateRange.endDate.toISOString());
-          }
-          if (filterState.numberRange) {
-            params.set(`${key}_min`, String(filterState.numberRange[0]));
-            params.set(`${key}_max`, String(filterState.numberRange[1]));
-          }
-        });
-
-        const url = `${apiUrl}${apiUrl.includes('?') ? '&' : '?'}${params.toString()}`;
-        const response = await fetch(url, { headers: apiHeaders });
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const apiResult = await response.json();
-        
-        // Extract data using custom path or fallback to common patterns
-        const extractedData = apiResult[dataPath] || apiResult.data || apiResult.results || apiResult.masters || apiResult;
-        const extractedTotal = apiResult[totalPath] || apiResult.total || apiResult.totalRecords || apiResult.totalMasters || (Array.isArray(extractedData) ? extractedData.length : 0);
-        
-        setData(Array.isArray(extractedData) ? extractedData : []);
-        setTotalRecords(extractedTotal);
+      if (state.sortColumn) {
+        params.set('sortColumn', state.sortColumn);
+        params.set('sortDirection', state.sortDirection);
       }
       
+      if (state.universalSearch) {
+        params.set('search', state.universalSearch);
+      }
+      
+      // Add column filters
+      Object.entries(state.columnFilters).forEach(([key, filterState]) => {
+        if (filterState.text) {
+          params.set(key, filterState.text);
+        }
+        if (filterState.dateRange?.startDate && filterState.dateRange?.endDate) {
+          params.set(`${key}_start`, filterState.dateRange.startDate.toISOString());
+          params.set(`${key}_end`, filterState.dateRange.endDate.toISOString());
+        }
+        if (filterState.numberRange) {
+          params.set(`${key}_min`, String(filterState.numberRange[0]));
+          params.set(`${key}_max`, String(filterState.numberRange[1]));
+        }
+      });
+
+      const url = `${apiUrl}${apiUrl.includes('?') ? '&' : '?'}${params.toString()}`;
+      const response = await fetch(url, { headers: apiHeaders });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      
+      // Extract data using custom path or fallback to common patterns
+      let extractedData;
+      let extractedTotal;
+      
+      // If result is directly an array (e.g., JSONPlaceholder)
+      if (Array.isArray(result)) {
+        extractedData = result;
+        extractedTotal = result.length;
+      } else {
+        extractedData = result[dataPath] || result.data || result.results || result.masters || result;
+        extractedTotal = result[totalPath] || result.total || result.totalRecords || result.totalMasters || (Array.isArray(extractedData) ? extractedData.length : 0);
+      }
+      
+      setData(Array.isArray(extractedData) ? extractedData : []);
+      setTotalRecords(extractedTotal);
+      
       // Calculate min/max for number columns
-      const currentData = isClientMode ? clientData : data;
-      if (Array.isArray(currentData) && currentData.length > 0) {
+      if (Array.isArray(extractedData) && extractedData.length > 0) {
         const stats: Record<string, { min: number; max: number }> = {};
         
         columns.forEach(col => {
           if (col.type === 'number') {
-            const values = currentData.map((row: any) => row[col.key]).filter((v: any) => typeof v === 'number');
+            const values = extractedData.map((row: any) => row[col.key]).filter((v: any) => typeof v === 'number');
             if (values.length > 0) {
               stats[col.key] = {
                 min: Math.min(...values),
@@ -268,27 +244,16 @@ export const JTable: React.FC<JTableProps> = ({
       setData([]);
       setTotalRecords(0);
     } finally {
-      if (externalLoading === undefined) {
-        setLoading(false);
-      }
+      setLoading(false);
     }
-  }, [state.page, state.pageSize, state.sortColumn, state.sortDirection, state.universalSearch, state.columnFilters, apiUrl, apiHeaders, searchMode, columns, dataPath, totalPath, onFetchData, isClientMode, clientData, clientTotal, externalLoading]);
-
-  // Sync client data when it changes
-  useEffect(() => {
-    if (isClientMode) {
-      setData(clientData || []);
-      setTotalRecords(clientTotal || 0);
-    }
-  }, [clientData, clientTotal, isClientMode]);
+  }, [state.page, state.pageSize, state.sortColumn, state.sortDirection, state.universalSearch, state.columnFilters, apiUrl, apiHeaders, searchMode, columns, dataPath, totalPath]);
 
   // Update URL and fetch data when state changes
   useEffect(() => {
     updateURL(state);
-    if (!isClientMode) {
-      fetchData();
-    }
-  }, [state.page, state.pageSize, state.sortColumn, state.sortDirection, state.universalSearch, state.columnFilters, isClientMode]);
+    fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.page, state.pageSize, state.sortColumn, state.sortDirection, state.universalSearch, state.columnFilters]);
 
   // Close filter dropdown when clicking outside
   useEffect(() => {

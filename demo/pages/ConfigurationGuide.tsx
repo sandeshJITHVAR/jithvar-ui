@@ -579,52 +579,16 @@ const columns = [
   enableColumnSearch={true}
 />`} />
 
-        <h3>🆕 Client-Side Data Mode</h3>
+        <h3>✨ Advanced Column Customization</h3>
         <div style={{ 
-          background: '#dcfce7', 
+          background: '#dbeafe', 
           padding: '16px', 
           borderRadius: '8px',
-          border: '2px solid #86efac',
+          border: '2px solid #60a5fa',
           marginBottom: '16px'
         }}>
-          <strong>✨ New in v1.0.5:</strong> Use JTable with client-side data without API calls!
+          <strong>🎨 New in v1.0.5:</strong> Enhanced column and row customization with dynamic styling!
         </div>
-        <CodeBlock code={`// Fetch and format data yourself, then pass to JTable
-const [data, setData] = useState([]);
-const [loading, setLoading] = useState(false);
-const [total, setTotal] = useState(0);
-
-// Custom data fetcher
-const fetchData = async (params) => {
-  setLoading(true);
-  try {
-    const response = await fetch(\`/api/users?\${new URLSearchParams(params)}\`);
-    const result = await response.json();
-    
-    // Format data however you want
-    const formattedData = result.users.map(user => ({
-      id: user._id,
-      fullName: \`\${user.firstName} \${user.lastName}\`,
-      // ... custom formatting
-    }));
-    
-    setData(formattedData);
-    setTotal(result.total);
-  } finally {
-    setLoading(false);
-  }
-};
-
-<JTable
-  columns={columns}
-  data={data}                    // Your formatted data
-  totalRecords={total}           // Total count for pagination
-  loading={loading}              // Your loading state
-  onFetchData={fetchData}        // Your custom fetcher
-  enableUrlState={false}         // Optional: disable URL params
-/>`} />
-
-        <h3>🆕 Advanced Column Customization</h3>
         <CodeBlock code={`const columns = [
   {
     key: 'name',
@@ -656,7 +620,7 @@ const fetchData = async (params) => {
   },
 ];`} />
 
-        <h3>🆕 Advanced Row Customization</h3>
+        <h3>✨ Advanced Row Customization</h3>
         <CodeBlock code={`<JTable
   columns={columns}
   apiUrl="/api/users"
@@ -682,7 +646,7 @@ const fetchData = async (params) => {
   }}
 />`} />
 
-        <h3>🆕 Custom API Response Paths</h3>
+        <h3>✨ Custom API Response Paths</h3>
         <CodeBlock code={`// API returns: { masters: [...], totalMasters: 150 }
 <JTable
   columns={columns}
@@ -699,7 +663,7 @@ const fetchData = async (params) => {
   totalPath="pagination.total"  // Nested path support coming soon
 />`} />
 
-        <h3>🆕 URL State Management</h3>
+        <h3>✨ URL State Management</h3>
         <CodeBlock code={`// Enable URL state (default for API mode)
 <JTable
   columns={columns}

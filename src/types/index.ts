@@ -78,16 +78,12 @@ export interface JTableBulkAction {
 export interface JTableProps {
   columns: JTableColumn[];
   
-  // Data source - either API or client-side data
-  apiUrl?: string;
+  // Data source - API
+  apiUrl: string;
   apiHeaders?: Record<string, string>;
-  data?: any[]; // Client-side data (already formatted)
-  totalRecords?: number; // Total records for client-side pagination
-  loading?: boolean; // External loading state
-  onFetchData?: (params: any) => Promise<{ data: any[]; total: number }>; // Custom data fetcher
   dataPath?: string; // Path to data array in API response (e.g., 'data', 'results', 'masters')
   totalPath?: string; // Path to total count in API response (e.g., 'total', 'totalRecords', 'totalMasters')
-  enableUrlState?: boolean; // Enable URL state management (default: true for API mode, false for client mode)
+  enableUrlState?: boolean; // Enable URL state management (default: true)
   
   // Search & Filter
   enableUniversalSearch?: boolean;
