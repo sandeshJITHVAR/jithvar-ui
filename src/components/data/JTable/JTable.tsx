@@ -419,6 +419,35 @@ export const JTable: React.FC<JTableProps> = ({
   const visibleColumnsData = columns.filter(col => state.visibleColumns.includes(col.key));
   const hasActions = actions.length > 0;
 
+
+  const positionDropdown = (dropdownEl: HTMLElement, buttonEl: HTMLElement) => {
+  if (!dropdownEl || !buttonEl) return;
+
+  const dropdownRect = dropdownEl.getBoundingClientRect();
+  const buttonRect = buttonEl.getBoundingClientRect();
+
+  const viewportWidth = window.innerWidth;
+
+  // Default: align to right of button
+  let left = buttonRect.right - dropdownRect.width;
+  let right = 'auto';
+
+  // If dropdown goes off left edge, flip to left alignment
+  if (left < 0) {
+    left = buttonRect.left;
+  }
+
+  // If dropdown goes off right edge, adjust to left
+  if (buttonRect.left + dropdownRect.width > viewportWidth) {
+    left = viewportWidth - dropdownRect.width - 16; // small padding
+  }
+
+  dropdownEl.style.left = `${left}px`;
+  dropdownEl.style.top = `${buttonRect.bottom + 8}px`; // below button
+  dropdownEl.style.position = 'fixed'; // important to prevent scroll clipping
+};
+
+
   const renderFilterDropdown = (column: JTableColumn) => {
     const isActive = state.activeFilterColumn === column.key;
     const currentFilter = state.columnFilters[column.key] || {};
@@ -429,6 +458,7 @@ export const JTable: React.FC<JTableProps> = ({
     return (
       <div className="jv-jtable-filter-wrapper">
         <button
+          data-filter-btn={column.key}
           className={classNames(
             'jv-jtable-filter-btn',
             hasFilter && 'jv-jtable-filter-btn-active',
@@ -444,7 +474,14 @@ export const JTable: React.FC<JTableProps> = ({
 
         {isActive && (
           <div
-            ref={el => filterRefs.current[column.key] = el}
+            // ref={el => filterRefs.current[column.key] = el}
+            ref={el => {
+      if (el) {
+        filterRefs.current[column.key] = el;
+        const buttonEl = document.querySelector(`[data-filter-btn="${column.key}"]`) as HTMLElement;
+        if (buttonEl) positionDropdown(el, buttonEl);
+      }
+    }}
             className="jv-jtable-filter-dropdown"
           >
             {column.type === 'date' ? (

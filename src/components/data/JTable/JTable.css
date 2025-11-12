@@ -170,6 +170,7 @@
   border-radius: 0.5rem;
   font-size: 0.875rem;
   transition: all 0.2s;
+  color:black
 }
 
 .jv-jtable-search-input:focus {
@@ -431,11 +432,11 @@
   border-color: #3b82f6;
   color: white;
 }
-
+/* 
 .jv-jtable-filter-dropdown {
   position: absolute;
   top: calc(100% + 0.5rem);
-  left: 0;
+  right: 0;
   background: white;
   border: 1px solid #e5e7eb;
   border-radius: 0.5rem;
@@ -444,7 +445,21 @@
   min-width: 250px;
   max-width: 400px;
   width: max-content;
+} */
+
+.jv-jtable-filter-dropdown {
+  position: fixed; /* fixed, not absolute */
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  z-index: 2000;
+  min-width: 250px;
+  max-width: 400px;
+  width: max-content;
 }
+
+
 
 .jv-jtable-filter-content {
   padding: 1rem;
