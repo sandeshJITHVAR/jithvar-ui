@@ -24,10 +24,10 @@ export const JTable: React.FC<JTableProps> = ({
   dataPath = 'data',
   totalPath = 'total',
   enableUrlState = true,
+  apiParams = {},
   enableUniversalSearch = true,
   universalSearchPlaceholder = 'Search across all columns...',
   enableColumnSearch = true,
-  searchMode = 'like',
   enableSelection = true,
   selectionMode = 'multiple',
   onSelectionChange,
@@ -168,17 +168,24 @@ export const JTable: React.FC<JTableProps> = ({
 
     try {
       const params = new URLSearchParams();
-      params.set('page', String(state.page));
-      params.set('pageSize', String(state.pageSize));
-      params.set('searchMode', searchMode);
+      
+      // Use custom parameter names or defaults
+      const pageParam = apiParams.page || 'page';
+      const pageSizeParam = apiParams.pageSize || 'pageSize';
+      const sortColumnParam = apiParams.sortColumn || 'sortColumn';
+      const sortDirectionParam = apiParams.sortDirection || 'sortDirection';
+      const searchParam = apiParams.universalSearch || 'search';
+      
+      params.set(pageParam, String(state.page));
+      params.set(pageSizeParam, String(state.pageSize));
       
       if (state.sortColumn) {
-        params.set('sortColumn', state.sortColumn);
-        params.set('sortDirection', state.sortDirection);
+        params.set(sortColumnParam, state.sortColumn);
+        params.set(sortDirectionParam, state.sortDirection);
       }
       
       if (state.universalSearch) {
-        params.set('search', state.universalSearch);
+        params.set(searchParam, state.universalSearch);
       }
       
       // Add column filters
@@ -246,7 +253,7 @@ export const JTable: React.FC<JTableProps> = ({
     } finally {
       setLoading(false);
     }
-  }, [state.page, state.pageSize, state.sortColumn, state.sortDirection, state.universalSearch, state.columnFilters, apiUrl, apiHeaders, searchMode, columns, dataPath, totalPath]);
+  }, [state.page, state.pageSize, state.sortColumn, state.sortDirection, state.universalSearch, state.columnFilters, apiUrl, apiHeaders, apiParams, columns, dataPath, totalPath]);
 
   // Update URL and fetch data when state changes
   useEffect(() => {
@@ -439,9 +446,6 @@ export const JTable: React.FC<JTableProps> = ({
                   onChange={(e) => handleColumnFilter(column.key, { text: e.target.value })}
                   autoFocus
                 />
-                <div className="jv-jtable-filter-mode">
-                  <small>Search mode: {searchMode}</small>
-                </div>
               </div>
             )}
             

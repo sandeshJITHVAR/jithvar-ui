@@ -49,6 +49,37 @@ Jithvar UI is developed and maintained by [**Jithvar Consultancy Services**](htt
 
 [🌐 Visit Jithvar.com](https://jithvar.com) • [📧 Contact Us](mailto:contact@jithvar.com) • [💼 Our Services](https://jithvar.com/services)
 
+## 🚀 What's New in v1.1.0-beta.1
+
+### 🆕 Enhanced JTable Features
+
+- ✨ **Custom API Parameter Mapping** - Map table parameters to your API's expected names (e.g., `pageSize` → `limit`, `page` → `offset`)
+- 🔄 **Improved Skeleton Loading** - Built-in skeleton loading within the table component itself
+- 🎯 **Better Floating Actions** - Enhanced hover-based quick actions with improved positioning
+- 🚫 **Removed Search Mode Display** - Cleaner filter interface without search mode indicators
+- 📈 **Performance Optimizations** - Faster rendering and reduced bundle size
+
+### 💻 Quick Example
+
+```tsx
+import { JTable } from "jithvar-ui";
+
+<JTable
+  columns={columns}
+  apiUrl="/api/users"
+  apiParams={{
+    page: "offset", // Custom mapping
+    pageSize: "limit", // Your API's param names
+    sortColumn: "sort_by",
+    universalSearch: "q",
+  }}
+  floatingActions={{
+    enabled: true,
+    actions: [{ type: "copy" }, { type: "email" }, { type: "call" }],
+  }}
+/>;
+```
+
 ## 📦 Components
 
 ### 📊 Charts (20)
@@ -213,6 +244,211 @@ import { BarChart, PieChart, LineChart } from "jithvar-ui";
 
 ```tsx
 import { DatePicker, DateRangePicker } from "jithvar-ui";
+import { useState } from "react";
+
+function MyApp() {
+  const [date, setDate] = useState(null);
+  const [range, setRange] = useState({ startDate: null, endDate: null });
+
+  return (
+    <div>
+      {/* Single Date Selection */}
+      <DatePicker
+        value={date}
+        onChange={setDate}
+        placeholder="Select a date"
+        minDate={new Date()} // Only future dates
+      />
+
+      {/* Date Range with Presets */}
+      <DateRangePicker
+        value={range}
+        onChange={setRange}
+        placeholder="Select date range"
+        showPresets={true} // Yesterday, Last 7 days, etc.
+      />
+    </div>
+  );
+}
+```
+
+### Data Table (JTable)
+
+```tsx
+import { JTable } from "jithvar-ui";
+
+function UsersTable() {
+  const columns = [
+    { key: "id", label: "ID", sortable: true, width: "80px" },
+    { key: "name", label: "Name", sortable: true, searchable: true },
+    { key: "email", label: "Email", searchable: true },
+    {
+      key: "status",
+      label: "Status",
+      render: (value) => (
+        <span
+          style={{
+            padding: "4px 8px",
+            borderRadius: "4px",
+            backgroundColor: value === "active" ? "#dcfce7" : "#fee2e2",
+            color: value === "active" ? "#166534" : "#991b1b",
+          }}
+        >
+          {value}
+        </span>
+      ),
+    },
+  ];
+
+  return (
+    <JTable
+      columns={columns}
+      apiUrl="/api/users"
+      // Custom API parameter mapping
+      apiParams={{
+        page: "page",
+        pageSize: "per_page",
+        sortColumn: "sort_by",
+        universalSearch: "search",
+      }}
+      // Features
+      enableUniversalSearch={true}
+      enableSelection={true}
+      // Actions
+      actions={[
+        {
+          icon: "👁️",
+          tooltip: "View Details",
+          onClick: (row) => console.log("View:", row),
+          variant: "primary",
+        },
+      ]}
+      // Floating actions (hover over cells)
+      floatingActions={{
+        enabled: true,
+        actions: [
+          {
+            type: "copy",
+            onClick: (row) => navigator.clipboard.writeText(row.name),
+          },
+          {
+            type: "email",
+            onClick: (row) => window.open(`mailto:${row.email}`),
+          },
+        ],
+      }}
+    />
+  );
+}
+```
+
+### Form Inputs
+
+```tsx
+import { SearchableSelect, RangeSlider, MaskInput, Checkbox } from "jithvar-ui";
+
+function ContactForm() {
+  const [country, setCountry] = useState(null);
+  const [ageRange, setAgeRange] = useState([18, 65]);
+  const [phone, setPhone] = useState("");
+  const [subscribe, setSubscribe] = useState(false);
+
+  const countries = [
+    { value: "US", label: "United States" },
+    { value: "CA", label: "Canada" },
+    { value: "UK", label: "United Kingdom" },
+  ];
+
+  return (
+    <form>
+      {/* Searchable Dropdown */}
+      <SearchableSelect
+        options={countries}
+        value={country}
+        onChange={setCountry}
+        placeholder="Select country"
+        searchable={true}
+      />
+
+      {/* Range Slider */}
+      <RangeSlider
+        min={18}
+        max={80}
+        value={ageRange}
+        onChange={setAgeRange}
+        label="Age Range"
+        showLabels={true}
+      />
+
+      {/* Masked Input */}
+      <MaskInput
+        mask="(999) 999-9999"
+        value={phone}
+        onChange={setPhone}
+        placeholder="(555) 123-4567"
+      />
+
+      {/* Checkbox */}
+      <Checkbox
+        checked={subscribe}
+        onChange={setSubscribe}
+        label="Subscribe to newsletter"
+      />
+    </form>
+  );
+}
+```
+
+### Alerts & Notifications
+
+```tsx
+import { JAlerts } from "jithvar-ui";
+
+function MyComponent() {
+  const showSuccess = () => {
+    JAlerts.success({
+      title: 'Success!',
+      message: 'Your data has been saved successfully.',
+      duration: 3000 // Auto-close after 3 seconds
+    });
+  };
+
+  const showConfirmation = async () => {
+    const result = await JAlerts.confirm({
+      title: 'Delete Item',
+      message: 'Are you sure you want to delete this item?',
+      confirmButton: 'Yes, Delete',
+      cancelButton: 'Cancel',
+      type: 'warning'
+    });
+
+    if (result.confirmed) {
+      // User clicked "Yes, Delete"
+      console.log('Item deleted');
+    }
+  };
+
+  const showInput = async () => {
+    const result = await JAlerts.input({
+      title: 'Enter Your Name',
+      message: 'Please provide your full name:',
+      placeholder: 'John Doe',
+      confirmButton: 'Submit'
+    });
+
+    if (result.confirmed) {
+      console.log('User entered:', result.value);
+    }
+  };
+
+  return (
+    <div>
+      <button onClick={showSuccess}>Show Success</button>
+      <button onClick={showConfirmation}>Show Confirmation</button>
+      <button onClick={showInput}>Show Input Dialog</button>
+    </div>
+  );
+}
 
 // Single Date Picker
 <DatePicker

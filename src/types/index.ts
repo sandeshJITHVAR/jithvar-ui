@@ -75,6 +75,15 @@ export interface JTableBulkAction {
   disabled?: (selectedRows: any[]) => boolean;
 }
 
+export interface JTableApiParams {
+  page?: string; // Default: 'page'
+  pageSize?: string; // Default: 'pageSize'
+  sortColumn?: string; // Default: 'sortColumn'
+  sortDirection?: string; // Default: 'sortDirection'
+  universalSearch?: string; // Default: 'search'
+  [key: string]: string | undefined; // Allow custom parameter mappings
+}
+
 export interface JTableProps {
   columns: JTableColumn[];
   
@@ -84,12 +93,12 @@ export interface JTableProps {
   dataPath?: string; // Path to data array in API response (e.g., 'data', 'results', 'masters')
   totalPath?: string; // Path to total count in API response (e.g., 'total', 'totalRecords', 'totalMasters')
   enableUrlState?: boolean; // Enable URL state management (default: true)
+  apiParams?: JTableApiParams; // Custom API parameter mapping
   
   // Search & Filter
   enableUniversalSearch?: boolean;
   universalSearchPlaceholder?: string;
   enableColumnSearch?: boolean;
-  searchMode?: 'exact' | 'like' | 'startsWith' | 'endsWith';
   
   // Selection
   enableSelection?: boolean;

@@ -1,7 +1,7 @@
 {
   "name": "jithvar-ui",
-  "version": "1.0.5",
-  "description": "Professional React component library with 34 production-ready components including 20 interactive charts, advanced form inputs, data tables, and enterprise-grade UI tools. Built with TypeScript for Next.js and React applications. Supports React 17, 18, and 19.",
+  "version": "1.1.0-beta.1",
+  "description": "Professional React component library with 34 production-ready components including 20 interactive charts, advanced form inputs, data tables, and enterprise-grade UI tools. Built with TypeScript for Next.js and React applications. Supports React 17, 18, and 19. NEW: Enhanced JTable with custom API parameter mapping, improved skeleton loading, and better floating actions.",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
   "types": "dist/index.d.ts",
@@ -26,7 +26,9 @@
     "dev": "rollup -c -w",
     "test": "echo \"Error: no test specified\" && exit 1",
     "demo": "vite demo",
-    "build:demo": "vite build demo"
+    "build:demo": "vite build demo",
+    "publish:beta": "npm publish --tag beta",
+    "publish:latest": "npm publish --tag latest"
   },
   "keywords": [
     "react",
@@ -49,6 +51,10 @@
     "data-table",
     "pagination",
     "range-slider",
+    "api-parameter-mapping",
+    "skeleton-loading",
+    "floating-actions",
+    "beta",
     "forms",
     "inputs",
     "checkbox",

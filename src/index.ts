@@ -82,6 +82,7 @@ export type {
   JTableColumn, 
   JTableAction, 
   JTableProps,
+  JTableApiParams,
   FilterState 
 } from './types';
 

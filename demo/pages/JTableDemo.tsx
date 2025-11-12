@@ -24,7 +24,7 @@ export const JTableDemo: React.FC = () => {
 
   // Simulate progressive loading
   useEffect(() => {
-    const timeouts: NodeJS.Timeout[] = [];
+    const timeouts: number[] = [];
     
     timeouts.push(setTimeout(() => {
       setLoadingSections(prev => ({ ...prev, header: false }));
@@ -630,6 +630,91 @@ const AdvancedExample = () => {
       </section>
 
       <section className="jv-section">
+        <h2>🔗 Custom API Parameter Mapping</h2>
+        <p>Map table parameters to your API's expected parameter names. Useful when your backend uses different parameter names than the defaults.</p>
+        <CodeBlock code={`import { JTable, JTableApiParams } from 'jithvar-ui';
+
+// Example: Your API expects 'limit' instead of 'pageSize' and 'offset' instead of 'page'
+const customApiParams: JTableApiParams = {
+  pageSize: 'limit',        // Maps pageSize to 'limit' parameter
+  page: 'offset',           // Maps page to 'offset' parameter
+  sortColumn: 'sort_by',    // Maps sortColumn to 'sort_by' parameter
+  sortDirection: 'order',   // Maps sortDirection to 'order' parameter
+  universalSearch: 'q',     // Maps search to 'q' parameter
+};
+
+<JTable
+  columns={columns}
+  apiUrl="https://your-api.com/data"
+  apiParams={customApiParams}
+  enableUniversalSearch={true}
+  enablePagination={true}
+/>
+
+// The above will generate API calls like:
+// https://your-api.com/data?limit=25&offset=1&sort_by=name&order=asc&q=john`} />
+        <div className="jv-info-box">
+          <strong>📝 Default Parameter Names:</strong>
+          <ul style={{ marginTop: '8px', paddingLeft: '20px' }}>
+            <li><code>page</code> - Current page number</li>
+            <li><code>pageSize</code> - Number of items per page</li>
+            <li><code>sortColumn</code> - Column to sort by</li>
+            <li><code>sortDirection</code> - Sort direction (asc/desc)</li>
+            <li><code>search</code> - Universal search term</li>
+            <li>Column filters use the column key directly (e.g., <code>name</code>, <code>email</code>)</li>
+          </ul>
+        </div>
+      </section>
+
+      <section className="jv-section">
+        <h3>1.5. API Parameter Mapping</h3>
+        <CodeBlock code={`interface JTableApiParams {
+  page?: string;           // Map 'page' to custom param name
+  pageSize?: string;       // Map 'pageSize' to custom param name
+  sortColumn?: string;     // Map 'sortColumn' to custom param name
+  sortDirection?: string;  // Map 'sortDirection' to custom param name
+  universalSearch?: string; // Map 'search' to custom param name
+  [key: string]: string | undefined; // Additional custom mappings
+}
+
+// Common API parameter mappings:
+
+// Laravel/PHP style
+const laravelParams: JTableApiParams = {
+  page: 'page',
+  pageSize: 'per_page',
+  sortColumn: 'sort',
+  sortDirection: 'direction',
+  universalSearch: 'search'
+};
+
+// REST API style
+const restParams: JTableApiParams = {
+  page: 'offset',
+  pageSize: 'limit', 
+  sortColumn: 'sort_by',
+  sortDirection: 'order',
+  universalSearch: 'q'
+};
+
+// GraphQL style
+const graphqlParams: JTableApiParams = {
+  page: 'pageNumber',
+  pageSize: 'recordsPerPage',
+  sortColumn: 'orderBy',
+  sortDirection: 'sortDirection',
+  universalSearch: 'filter'
+};
+
+// Example usage:
+<JTable
+  columns={columns}
+  apiUrl="/api/users"
+  apiParams={laravelParams}
+/>`} />
+      </section>
+
+      <section className="jv-section">
         <h2>Props</h2>
         <div className="jv-props-table">
           <div className="jv-prop">
@@ -641,6 +726,11 @@ const AdvancedExample = () => {
             <code>apiUrl</code>
             <span className="jv-prop-type">string</span>
             <p>API endpoint for fetching data</p>
+          </div>
+          <div className="jv-prop">
+            <code>apiParams</code>
+            <span className="jv-prop-type">JTableApiParams</span>
+            <p>Custom API parameter mapping (optional)</p>
           </div>
           <div className="jv-prop">
             <code>floatingActions</code>
@@ -688,6 +778,12 @@ const AdvancedExample = () => {
   rowKey?: string;                    // default: 'id'
   className?: string;
   rowClassName?: string | ((row: any) => string);
+  
+  // API Configuration
+  apiParams?: JTableApiParams;        // Custom parameter mapping
+  dataPath?: string;                  // default: 'data'
+  totalPath?: string;                 // default: 'total'
+  apiHeaders?: Record<string, string>; // Custom headers
   
   // Search & Filter
   enableUniversalSearch?: boolean;    // default: true
@@ -827,7 +923,54 @@ GET /api/users?page=1&pageSize=10&search=john&sortColumn=name&sortDirection=asc
 // - {columnKey}_min, {columnKey}_max: Range filter for numbers
 // - {columnKey}_start, {columnKey}_end: Date range filter`} />
 
-        <h3>6. Complete Working Example</h3>
+        <h3>6. Custom API Parameter Mapping</h3>
+        <p>Map JTable parameters to your API's expected parameter names:</p>
+        <CodeBlock code={`// Example: Your API expects 'limit' instead of 'pageSize', 'offset' instead of 'page'
+<JTable
+  columns={columns}
+  apiUrl="/api/products"
+  apiParams={{
+    page: 'offset',           // JTable 'page' → API 'offset'
+    pageSize: 'limit',        // JTable 'pageSize' → API 'limit'
+    sortColumn: 'sort_by',    // JTable 'sortColumn' → API 'sort_by'
+    sortDirection: 'order',   // JTable 'sortDirection' → API 'order'
+    universalSearch: 'q',     // JTable 'search' → API 'q'
+  }}
+/>
+
+// Generated API call: /api/products?limit=25&offset=1&sort_by=name&order=asc&q=john
+
+// Example: Laravel-style API parameters
+<JTable
+  columns={columns}
+  apiUrl="/api/users"
+  apiParams={{
+    page: 'page',
+    pageSize: 'per_page',
+    sortColumn: 'sort',
+    sortDirection: 'direction',
+    universalSearch: 'search',
+  }}
+  dataPath="data"           // Laravel returns { data: [...], total: 100 }
+  totalPath="total"
+/>
+
+// Example: Custom pagination format
+<JTable
+  columns={columns}
+  apiUrl="/api/customers"
+  apiParams={{
+    page: 'pageNumber',
+    pageSize: 'recordsPerPage',
+    sortColumn: 'sortField',
+    sortDirection: 'sortOrder',
+    universalSearch: 'globalFilter',
+  }}
+  dataPath="records"        // API returns { records: [...], totalCount: 500 }
+  totalPath="totalCount"
+/>`} />
+
+        <h3>7. Complete Working Example</h3>
         <CodeBlock code={`import { JTable, JTableColumn, JTableAction } from 'jithvar-ui';
 import { useState } from 'react';
 
@@ -852,12 +995,35 @@ export const UsersTable = () => {
       render: (value, row) => (
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <img
-            src={row.avatar}
+            src={row.avatar || '/default-avatar.png'}
             alt={value}
             style={{ width: '32px', height: '32px', borderRadius: '50%' }}
           />
-          <span>{value}</span>
+          <div>
+            <div style={{ fontWeight: '500' }}>{row.name}</div>
+            <div style={{ fontSize: '12px', color: '#6b7280' }}>{row.designation}</div>
+          </div>
         </div>
+      ),
+    },
+    {
+      key: 'email',
+      label: 'Email',
+      searchable: true,
+      render: (value) => (
+        <a href={\`mailto:\${value}\`} style={{ color: '#3b82f6', textDecoration: 'none' }}>
+          {value}
+        </a>
+      ),
+    },
+    {
+      key: 'phone',
+      label: 'Phone',
+      searchable: true,
+      render: (value) => (
+        <a href={\`tel:\${value}\`} style={{ color: '#10b981', textDecoration: 'none' }}>
+          {value}
+        </a>
       ),
     },
     {
@@ -873,42 +1039,194 @@ export const UsersTable = () => {
           backgroundColor: value === 'active' ? '#dcfce7' : '#fee2e2',
           color: value === 'active' ? '#16a34a' : '#dc2626',
         }}>
-          {value}
+          {value.toUpperCase()}
         </span>
       ),
+    },
+    {
+      key: 'joinDate',
+      label: 'Join Date',
+      sortable: true,
+      filterable: true,
+      type: 'date',
+      render: (value) => new Date(value).toLocaleDateString(),
     },
   ];
 
   const actions: JTableAction[] = [
     {
       icon: '👁️',
-      tooltip: 'View',
-      onClick: (row) => window.location.href = \`/users/\${row.id}\`,
+      tooltip: 'View Details',
+      onClick: (row) => window.open(\`/users/\${row.id}\`, '_blank'),
       variant: 'primary',
     },
     {
       icon: '✏️',
-      tooltip: 'Edit',
+      tooltip: 'Edit User',
       onClick: (row) => window.location.href = \`/users/\${row.id}/edit\`,
       variant: 'secondary',
       disabled: (row) => row.status === 'inactive',
     },
     {
       icon: '🗑️',
-      tooltip: 'Delete',
+      tooltip: 'Delete User',
       onClick: async (row) => {
-        if (confirm(\`Delete \${row.name}?\`)) {
-          await fetch(\`/api/users/\${row.id}\`, { method: 'DELETE' });
-          window.location.reload();
+        const confirmed = await new Promise(resolve => {
+          if (confirm(\`Are you sure you want to delete \${row.name}?\`)) {
+            resolve(true);
+          } else {
+            resolve(false);
+          }
+        });
+        
+        if (confirmed) {
+          try {
+            await fetch(\`/api/users/\${row.id}\`, { method: 'DELETE' });
+            window.location.reload();
+          } catch (error) {
+            alert('Failed to delete user');
+          }
         }
       },
       variant: 'danger',
-      visible: (row) => row.role === 'admin',
+      visible: (row) => row.role !== 'admin', // Don't show delete for admin users
+    },
+  ];
+
+  const bulkActions = [
+    {
+      label: 'Export Selected',
+      icon: '📥',
+      onClick: (selectedRows) => {
+        const csv = selectedRows.map(row => 
+          \`\${row.name},\${row.email},\${row.status}\`
+        ).join('\\n');
+        
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'users.csv';
+        a.click();
+        URL.revokeObjectURL(url);
+      },
+      variant: 'primary' as const,
+    },
+    {
+      label: 'Deactivate Selected',
+      icon: '🚫',
+      onClick: async (selectedRows) => {
+        if (confirm(\`Deactivate \${selectedRows.length} users?\`)) {
+          for (const row of selectedRows) {
+            await fetch(\`/api/users/\${row.id}\`, {
+              method: 'PATCH',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ status: 'inactive' })
+            });
+          }
+          window.location.reload();
+        }
+      },
+      variant: 'warning' as const,
+      disabled: (selectedRows) => selectedRows.some(row => row.status === 'inactive'),
     },
   ];
 
   return (
-    <div>
+    <div style={{ padding: '20px' }}>
+      <h1>Users Management</h1>
+      
+      <JTable
+        columns={columns}
+        apiUrl="/api/users"
+        
+        // Custom API parameter mapping
+        apiParams={{
+          page: 'page',
+          pageSize: 'per_page',
+          sortColumn: 'sort_by',
+          sortDirection: 'sort_order',
+          universalSearch: 'search',
+        }}
+        
+        // Response structure
+        dataPath="data"
+        totalPath="total"
+        
+        // Features
+        enableUniversalSearch={true}
+        universalSearchPlaceholder="Search users by name, email, phone..."
+        enableSelection={true}
+        selectionMode="multiple"
+        onSelectionChange={setSelectedRows}
+        
+        // Bulk actions
+        bulkActions={bulkActions}
+        
+        // Row actions
+        actions={actions}
+        actionColumnLabel="Actions"
+        actionColumnPosition="right"
+        
+        // Floating actions (hover over cells)
+        floatingActions={{
+          enabled: true,
+          phoneField: 'phone',
+          emailField: 'email',
+          actions: [
+            { type: 'copy', onClick: (row) => console.log('Copied:', row) },
+            { type: 'call', onClick: (row) => console.log('Calling:', row.phone) },
+            { type: 'email', onClick: (row) => console.log('Emailing:', row.email) },
+          ],
+        }}
+        
+        // Pagination
+        enablePagination={true}
+        pageSizeOptions={[10, 25, 50, 100]}
+        defaultPageSize={25}
+        
+        // Styling
+        striped={true}
+        hover={true}
+        bordered={false}
+        stickyHeader={true}
+        
+        // Row events
+        onRowClick={(row) => console.log('Row clicked:', row)}
+        onRowDoubleClick={(row) => window.open(\`/users/\${row.id}\`, '_blank')}
+        
+        // Custom styling
+        className="users-table"
+        tableClassName="custom-table"
+        headerClassName="table-header"
+        rowClassName={(row, index) => 
+          row.status === 'inactive' ? 'inactive-row' : ''
+        }
+      />
+    </div>
+  );
+};
+
+// Custom CSS (optional)
+const customStyles = \`
+.users-table .inactive-row {
+  opacity: 0.6;
+  background-color: #f9fafb;
+}
+
+.users-table .table-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.users-table .custom-table {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+\`;
+
+export default UsersTable;
       <JTable
         columns={columns}
         apiUrl="/api/users"
