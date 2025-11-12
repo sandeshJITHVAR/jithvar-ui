@@ -102,6 +102,7 @@ export const JTable: React.FC<JTableProps> = ({
   const [columnStats, setColumnStats] = useState<Record<string, { min: number; max: number }>>({});
   const [floatingMenuPosition, setFloatingMenuPosition] = useState<{ x: number; y: number; rowId: string; columnKey: string } | null>(null);
   const [openDropdownRowId, setOpenDropdownRowId] = useState<string | null>(null);
+  const [filterInputs, setFilterInputs] = useState<Record<string, string>>({}); // Track input values separately
   const filterRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const floatingMenuRef = useRef<HTMLDivElement | null>(null);
   const hideFloatingMenuTimeoutRef = useRef<number | null>(null);
@@ -171,7 +172,7 @@ export const JTable: React.FC<JTableProps> = ({
       
       // Use custom parameter names or defaults
       const pageParam = apiParams.page || 'page';
-      const pageSizeParam = apiParams.pageSize || 'pageSize';
+      const pageSizeParam = apiParams.pageSize || apiParams.limit || 'pageSize'; 
       const sortColumnParam = apiParams.sortColumn || 'sortColumn';
       const sortDirectionParam = apiParams.sortDirection || 'sortDirection';
       const searchParam = apiParams.universalSearch || 'search';
@@ -301,14 +302,22 @@ export const JTable: React.FC<JTableProps> = ({
   };
 
   const handleUniversalSearch = debounce((value: string) => {
+    // Only search if 3 or more characters
+    if (value.length < 3 && value.length > 0) {
+      return; // Don't call API if less than 3 characters
+    }
     setState((prev) => ({
       ...prev,
       universalSearch: value,
       page: 1,
     }));
-  }, 300);
+  }, 400);
 
-  const handleColumnFilter = (columnKey: string, filterState: FilterState) => {
+  const handleColumnFilter = debounce((columnKey: string, filterState: FilterState) => {
+    // For text filters, only apply if 3 or more characters (or empty to clear)
+    if (filterState.text !== undefined && filterState.text.length < 3 && filterState.text.length > 0) {
+      return; // Don't call API if less than 3 characters
+    }
     setState((prev) => ({
       ...prev,
       columnFilters: {
@@ -317,9 +326,27 @@ export const JTable: React.FC<JTableProps> = ({
       },
       page: 1,
     }));
+  }, 400);
+
+  // Handle column filter input - immediate UI update, debounced API call
+  const handleColumnFilterInputChange = (columnKey: string, value: string) => {
+    // Update input state immediately for UI feedback
+    setFilterInputs(prev => ({
+      ...prev,
+      [columnKey]: value,
+    }));
+    
+    // Call the debounced filter handler
+    handleColumnFilter(columnKey, { text: value });
   };
 
   const clearColumnFilter = (columnKey: string) => {
+    // Clear both the filter state and input state
+    setFilterInputs(prev => {
+      const newInputs = { ...prev };
+      delete newInputs[columnKey];
+      return newInputs;
+    });
     setState((prev) => {
       const newFilters = { ...prev.columnFilters };
       delete newFilters[columnKey];
@@ -411,6 +438,8 @@ export const JTable: React.FC<JTableProps> = ({
           type="button"
         >
           🔍
+
+          
         </button>
 
         {isActive && (
@@ -442,8 +471,8 @@ export const JTable: React.FC<JTableProps> = ({
                   type="text"
                   className="jv-jtable-filter-input"
                   placeholder={`Search ${column.label}...`}
-                  value={currentFilter.text || ''}
-                  onChange={(e) => handleColumnFilter(column.key, { text: e.target.value })}
+                  value={filterInputs[column.key] || currentFilter.text || ''}
+                  onChange={(e) => handleColumnFilterInputChange(column.key, e.target.value)}
                   autoFocus
                 />
               </div>
@@ -919,12 +948,7 @@ export const JTable: React.FC<JTableProps> = ({
         bordered && 'jv-jtable-bordered',
         compact && 'jv-jtable-compact'
       )}>
-        {loading && (
-          <div className="jv-jtable-loading-overlay">
-            <div className="jv-jtable-spinner"></div>
-            <span>{loadingMessage}</span>
-          </div>
-        )}
+      
 
         {error && (
           <div className="jv-jtable-error">
