@@ -60,8 +60,9 @@ export const JTable: React.FC<JTableProps> = ({
 }) => {
   // Determine if we should use URL state
   const shouldUseUrlState = enableUrlState;
+     const defaultVisibleColumns = columns.filter(c => c.visible !== false).map(c => c.key);
   const [state, setState] = useState<TableState>(() => {
-    const defaultVisibleColumns = columns.filter(c => c.visible !== false).map(c => c.key);
+    // const defaultVisibleColumns = columns.filter(c => c.visible !== false).map(c => c.key);
     
     if (!shouldUseUrlState) {
       // Don't read from URL in client mode or when URL state is disabled
@@ -102,6 +103,7 @@ export const JTable: React.FC<JTableProps> = ({
   const [columnStats, setColumnStats] = useState<Record<string, { min: number; max: number }>>({});
   const [floatingMenuPosition, setFloatingMenuPosition] = useState<{ x: number; y: number; rowId: string; columnKey: string } | null>(null);
   const [openDropdownRowId, setOpenDropdownRowId] = useState<string | null>(null);
+  const [filterInputs, setFilterInputs] = useState<Record<string, string>>({}); // Track input values separately
   const filterRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const floatingMenuRef = useRef<HTMLDivElement | null>(null);
   const hideFloatingMenuTimeoutRef = useRef<number | null>(null);
@@ -171,7 +173,7 @@ export const JTable: React.FC<JTableProps> = ({
       
       // Use custom parameter names or defaults
       const pageParam = apiParams.page || 'page';
-      const pageSizeParam = apiParams.pageSize || 'pageSize';
+      const pageSizeParam = apiParams.pageSize || apiParams.limit || 'pageSize'; 
       const sortColumnParam = apiParams.sortColumn || 'sortColumn';
       const sortDirectionParam = apiParams.sortDirection || 'sortDirection';
       const searchParam = apiParams.universalSearch || 'search';
@@ -301,14 +303,22 @@ export const JTable: React.FC<JTableProps> = ({
   };
 
   const handleUniversalSearch = debounce((value: string) => {
+    // Only search if 3 or more characters
+    if (value.length < 3 && value.length > 0) {
+      return; // Don't call API if less than 3 characters
+    }
     setState((prev) => ({
       ...prev,
       universalSearch: value,
       page: 1,
     }));
-  }, 300);
+  }, 400);
 
-  const handleColumnFilter = (columnKey: string, filterState: FilterState) => {
+  const handleColumnFilter = debounce((columnKey: string, filterState: FilterState) => {
+    // For text filters, only apply if 3 or more characters (or empty to clear)
+    if (filterState.text !== undefined && filterState.text.length < 3 && filterState.text.length > 0) {
+      return; // Don't call API if less than 3 characters
+    }
     setState((prev) => ({
       ...prev,
       columnFilters: {
@@ -317,9 +327,27 @@ export const JTable: React.FC<JTableProps> = ({
       },
       page: 1,
     }));
+  }, 400);
+
+  // Handle column filter input - immediate UI update, debounced API call
+  const handleColumnFilterInputChange = (columnKey: string, value: string) => {
+    // Update input state immediately for UI feedback
+    setFilterInputs(prev => ({
+      ...prev,
+      [columnKey]: value,
+    }));
+    
+    // Call the debounced filter handler
+    handleColumnFilter(columnKey, { text: value });
   };
 
   const clearColumnFilter = (columnKey: string) => {
+    // Clear both the filter state and input state
+    setFilterInputs(prev => {
+      const newInputs = { ...prev };
+      delete newInputs[columnKey];
+      return newInputs;
+    });
     setState((prev) => {
       const newFilters = { ...prev.columnFilters };
       delete newFilters[columnKey];
@@ -385,12 +413,74 @@ export const JTable: React.FC<JTableProps> = ({
     }));
   };
 
+  const clearAllFilters = () => {
+    //  const defaultVisibleColumns = columns.filter(c => c.visible !== false).map(c => c.key);
+    setFilterInputs({}); // Clear all filter inputs
+    setState((prev) => ({
+      ...prev,
+      page: 1,
+      pageSize: defaultPageSize,
+      sortColumn: null,
+      sortDirection: 'asc',
+      universalSearch: '',
+      columnFilters: {},
+      activeFilterColumn: null,
+
+        selectedRows: [],
+        visibleColumns: defaultVisibleColumns,
+    
+    }));
+  };
+
+  // Check if any filters are active
+  const hasActiveFilters = () => {
+    // const defaultVisibleColumns = columns.filter(c => c.visible !== false).map(c => c.key);
+    return (
+      state.universalSearch.length > 0 ||
+      Object.keys(state.columnFilters).length > 0 ||
+      state.sortColumn !== null ||
+      state.pageSize !== defaultPageSize ||
+      state.page !== 1 ||
+    state.selectedRows.length > 0 ||
+    state.visibleColumns.length !== defaultVisibleColumns.length
+    );
+  };
+
   const totalPages = Math.ceil(totalRecords / state.pageSize);
   const allSelected = data.length > 0 && state.selectedRows.length === data.length;
   const someSelected = state.selectedRows.length > 0 && !allSelected;
 
   const visibleColumnsData = columns.filter(col => state.visibleColumns.includes(col.key));
   const hasActions = actions.length > 0;
+
+
+  const positionDropdown = (dropdownEl: HTMLElement, buttonEl: HTMLElement) => {
+  if (!dropdownEl || !buttonEl) return;
+
+  const dropdownRect = dropdownEl.getBoundingClientRect();
+  const buttonRect = buttonEl.getBoundingClientRect();
+
+  const viewportWidth = window.innerWidth;
+
+  // Default: align to right of button
+  let left = buttonRect.right - dropdownRect.width;
+  let right = 'auto';
+
+  // If dropdown goes off left edge, flip to left alignment
+  if (left < 0) {
+    left = buttonRect.left;
+  }
+
+  // If dropdown goes off right edge, adjust to left
+  if (buttonRect.left + dropdownRect.width > viewportWidth) {
+    left = viewportWidth - dropdownRect.width - 16; // small padding
+  }
+
+  dropdownEl.style.left = `${left}px`;
+  dropdownEl.style.top = `${buttonRect.bottom + 8}px`; // below button
+  dropdownEl.style.position = 'fixed'; // important to prevent scroll clipping
+};
+
 
   const renderFilterDropdown = (column: JTableColumn) => {
     const isActive = state.activeFilterColumn === column.key;
@@ -402,6 +492,7 @@ export const JTable: React.FC<JTableProps> = ({
     return (
       <div className="jv-jtable-filter-wrapper">
         <button
+          data-filter-btn={column.key}
           className={classNames(
             'jv-jtable-filter-btn',
             hasFilter && 'jv-jtable-filter-btn-active',
@@ -411,11 +502,20 @@ export const JTable: React.FC<JTableProps> = ({
           type="button"
         >
           🔍
+
+          
         </button>
 
         {isActive && (
           <div
-            ref={el => filterRefs.current[column.key] = el}
+            // ref={el => filterRefs.current[column.key] = el}
+            ref={el => {
+      if (el) {
+        filterRefs.current[column.key] = el;
+        const buttonEl = document.querySelector(`[data-filter-btn="${column.key}"]`) as HTMLElement;
+        if (buttonEl) positionDropdown(el, buttonEl);
+      }
+    }}
             className="jv-jtable-filter-dropdown"
           >
             {column.type === 'date' ? (
@@ -442,8 +542,8 @@ export const JTable: React.FC<JTableProps> = ({
                   type="text"
                   className="jv-jtable-filter-input"
                   placeholder={`Search ${column.label}...`}
-                  value={currentFilter.text || ''}
-                  onChange={(e) => handleColumnFilter(column.key, { text: e.target.value })}
+                  value={filterInputs[column.key] || currentFilter.text || ''}
+                  onChange={(e) => handleColumnFilterInputChange(column.key, e.target.value)}
                   autoFocus
                 />
               </div>
@@ -860,7 +960,8 @@ export const JTable: React.FC<JTableProps> = ({
           </div>
         )}
 
-        {/* Column Toggle */}
+<div className='jv-jtable-column-toggle-and-clear'>
+ {/* Column Toggle */}
         {enableColumnToggle && (
           <div className="jv-jtable-column-toggle">
             <button className="jv-jtable-column-toggle-btn" type="button">
@@ -880,6 +981,20 @@ export const JTable: React.FC<JTableProps> = ({
             </button>
           </div>
         )}
+
+        {/* Clear All Filters Button */}
+        {hasActiveFilters() && (
+          <button
+            className="jv-jtable-clear-all-btn"
+            onClick={clearAllFilters}
+            title="Clear all filters, search, and sorting"
+            type="button"
+          >
+             Clear All
+          </button>
+        )}
+</div>
+       
       </div>
 
       {/* Bulk Actions Bar */}
@@ -919,12 +1034,7 @@ export const JTable: React.FC<JTableProps> = ({
         bordered && 'jv-jtable-bordered',
         compact && 'jv-jtable-compact'
       )}>
-        {loading && (
-          <div className="jv-jtable-loading-overlay">
-            <div className="jv-jtable-spinner"></div>
-            <span>{loadingMessage}</span>
-          </div>
-        )}
+      
 
         {error && (
           <div className="jv-jtable-error">
